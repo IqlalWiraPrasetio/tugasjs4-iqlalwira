@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tugas JS 4 Iqlal Wira Prasetio</title>
+</head>
+<body>
+
+<table border="1" align="center" id="pegawaiTable">
+    <thead>
+        <h2 align="center">Data Pegawai</h2>
+        <tr>
+            <th>Nama Pegawai</th>
+            <th>Jabatan</th>
+            <th>Status</th>
+            <th>Gaji Pokok</th>
+            <th>Tunjangan Jabatan</th>
+            <th>BPJS</th>
+            <th>Tunjangan Keluarga</th>
+            <th>Total Gaji</th>
+        </tr>
+    </thead>
+    <tbody id="pegawaiData">
+    </tbody>
+    <tfoot id="totalGaji" align="center">
+    </tfoot>
+</table>
+
+<script>
+// Fungsi untuk menghitung gaji berdasarkan jabatan dan status
+function hitungGaji(pegawai) {
+    var gajiPokok;
+    var tunjanganJabatan;
+    var bpjs;
+    var tunjanganKeluarga;
+
+    // Hitung Gaji Pokok
+    switch (pegawai.jabatan) {
+        case "Manager":
+            gajiPokok = 15000000;
+            break;
+        case "Asisten Manager":
+            gajiPokok = 10000000;
+            break;
+        case "Staff":
+            gajiPokok = 5000000;
+            break;
+        default:
+            gajiPokok = 0;
+    }
+
+    // Hitung Tunjangan Jabatan
+    tunjanganJabatan = 0.15 * gajiPokok;
+
+    // Hitung BPJS
+    bpjs = 0.10 * gajiPokok;
+
+    // Hitung Tunjangan Keluarga
+    tunjanganKeluarga = pegawai.status === "Menikah" ? 0.20 * gajiPokok : 0;
+
+    // Hitung Total Gaji
+    var totalGaji = gajiPokok + tunjanganJabatan - bpjs + tunjanganKeluarga;
+
+    return {
+        gajiPokok: gajiPokok,
+        tunjanganJabatan: tunjanganJabatan,
+        bpjs: bpjs,
+        tunjanganKeluarga: tunjanganKeluarga,
+        totalGaji: totalGaji
+    };
+}
+
+// Menampilkan data pegawai dalam tabel
+function tampilkanData(pegawai) {
+    var dataPegawai = hitungGaji(pegawai);
+    var tableBody = document.getElementById("pegawaiData");
+    var newRow = tableBody.insertRow();
+
+    newRow.insertCell().textContent = pegawai.nama;
+    newRow.insertCell().textContent = pegawai.jabatan;
+    newRow.insertCell().textContent = pegawai.status;
+    newRow.insertCell().textContent = formatRupiah(dataPegawai.gajiPokok);
+    newRow.insertCell().textContent = formatRupiah(dataPegawai.tunjanganJabatan);
+    newRow.insertCell().textContent = formatRupiah(dataPegawai.bpjs);
+    newRow.insertCell().textContent = formatRupiah(dataPegawai.tunjanganKeluarga);
+    newRow.insertCell().textContent = formatRupiah(dataPegawai.totalGaji);
+}
+
+// Format angka menjadi format mata uang
+function formatRupiah(angka) {
+    var number_string = angka.toString(),
+    sisa = number_string.length % 3,
+    rupiah = number_string.substr(0, sisa),
+    ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+    if (ribuan) {
+        separator = sisa ? '.' : '';
+        rupiah += separator + ribuan.join('.');
+    }
+
+    return "Rp " + rupiah;
+}
+
+// Data Pegawai
+var pegawai = [
+    { nama: "Iqlal Wira P", jabatan: "Manager", status: "Menikah" },
+    { nama: "Faza Shafa A", jabatan: "Asisten Manager", status: "Menikah" },
+    { nama: "Cantika Putri IF", jabatan: "Staff", status: "Belum Menikah" }
+];
+
+// Menambahkan data pegawai ke dalam tabel
+pegawai.forEach(function(data) {
+    tampilkanData(data);
+});
+
+// Menampilkan total gaji
+var totalGaji = pegawai.reduce(function(total, data) {
+    return total + hitungGaji(data).totalGaji;
+}, 0);
+
+var totalGajiRow = document.getElementById("totalGaji").insertRow();
+totalGajiRow.innerHTML = "<td colspan='7'>Total Gaji Pegawai</td><td>" + formatRupiah(totalGaji) + "</td>";
+</script>
+</body>
+</html>
